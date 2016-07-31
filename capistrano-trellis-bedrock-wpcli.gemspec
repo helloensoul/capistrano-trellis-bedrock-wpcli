@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Capistrano::Wpcli::VERSION
   spec.authors       = ["Ensoul"]
   spec.email         = ["hello@ensoul.it"]
-  spec.summary       = %q{Simple Capistrano wrapper around WP-CLI}
-  spec.description   = %q{Capistrano tasks for managing Wordpress}
+  spec.summary       = %q{Simple Capistrano wrapper around WP-CLI for Trellis and Bedrock}
+  spec.description   = %q{Provides command line tools to facilitate WordPress uploads and database deploy with Trellis and Bedrock.}
   spec.homepage      = "https://github.com/itsensoul/capistrano-trellis-bedrock-wpcli"
   spec.license       = "MIT"
 
@@ -17,12 +17,6 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
-
-  # spec.add_dependency 'capistrano', '~> 3.4.0'
-  # spec.add_dependency 'sshkit', '~> 1.7.0'
-
-  # spec.add_development_dependency "bundler", "~> 1.7.0"
-  # spec.add_development_dependency "rake", "~> 10.4.0"
 
   spec.add_dependency 'capistrano', '~> 3.6.0'
   spec.add_dependency 'sshkit', '~> 1.11.1'
