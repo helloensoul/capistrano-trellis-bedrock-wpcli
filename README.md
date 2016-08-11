@@ -1,155 +1,97 @@
-# Capistrano::WPCLI
+# Capistrano::WPCLI for Trellis and Bedrock
 
-[![Dependency Status](https://www.versioneye.com/user/projects/561c9bfda193340f2f001728/badge.svg?style=flat)](https://www.versioneye.com/user/projects/561c9bfda193340f2f001728)
+[![Dependency Status](https://www.versioneye.com/user/projects/579f823e72d75c0039f7a28b/badge.svg?style=flat)](https://www.versioneye.com/user/projects/579f823e72d75c0039f7a28b)
 
-**Note: this plugin works only with Capistrano 3.**
+**This project is based on [capistrano-wpcli](https://github.com/lavmeiker/capistrano-wpcli) and works only with Trellis and Bedrock.**
 
-Provides command line tools to facilitate Wordpress database and uploads deploy.
+Provides command line tools to facilitate WordPress database and uploads deploy with Trellis and Bedrock.
+
+## Requirements
+
+* Ruby >= 2.0
+
+Required gems:
+
+* `capistrano` (~> 3.6)
+* `sshkit` (~> 1.11)
+* `bundler` (~> 1.12)
+* `rake` (~> 11.2)
+
+These can be installed manually with `gem install <gem name>` but it's highly suggested you use [Bundler](http://bundler.io/) to manage them. Bundler is basically the Ruby equivalent to PHP's Composer. Just as Composer manages your PHP packages/dependencies, Bundler manages your Ruby gems/dependencies. Bundler itself is a Gem and can be installed via `gem install bundler` (sudo may be required).
+
+The `Gemfile` in the root of this repo specifies the required Gems (just like `composer.json`). Once you have Bundler installed, run `bundle install` to install the Gems in the `Gemfile`. When using Bundler, you'll need to prefix the `cap` command with `bundle exec` as seen below (this ensures you're not using system Gems which can cause conflicts).
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'capistrano-wpcli'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install capistrano-wpcli
+1. Download the latest release of [capistrano-bedrock](https://github.com/itsensoul/capistrano-bedrock/releases/latest).
+2. Copy the following `capistrano-bedrock` files into the root of your Bedrock project:
+  * `Capfile`
+  * `Gemfile`
+  * `Gemfile.lock`
+  * `database.sh`
+  * `uploads.sh`
+3. Copy the content of `capistrano-bedrock .gitignore` file into the `.gitignore` file of your Bedrock project.
+4. Copy the following `capistrano-bedrock` files/folders into your `config` directory:
+  * `config/deploy/*`
+  * `config/deploy.rb`
+5. Run `gem install bundler -v "~>1.12.0" && bundle` into the root of your Bedrock project.
+6. Edit your `config/deploy.rb` configs to set the roles/servers and connection options.
+7. Edit your `config/deploy/*` stage/environment configs to set the specific roles/servers and connection options for each stage/environment.
+8. Enjoy `capistrano-trellis-bedrock-wpcli` [Tasks](#tasksanchor).
 
 ## Usage
 
-All you need to do is put the following in `Capfile` file:
-
-    require 'capistrano/wpcli'
-
-### How it works (Tasks)
-
-    cap staging wpcli:db:push
-
-Pushes the local WP database to the remote server and replaces the urls.
-
-Optionally backs up the remote database before pushing (if `wpcli_backup_db` is set to true, see Configuration).
-
-- - -
-
-    cap staging wpcli:db:pull
-
-Pulls the remote server WP database to local and replaces the urls.
-
-- - -
-
-    cap staging wpcli:db:backup:remote
-
-Pulls the remote server WP database to localhost, uses `wpcli_local_db_backup_dir` to define the location of the export.
-
-- - -
-
-    cap development wpcli:db:backup:local
-
-Backs up the local WP database to localhost, uses `wpcli_local_db_backup_dir` to define the location of the export.
-
-- - -
-
-    cap staging wpcli:uploads:rsync:push
-
-Push local uploads delta to remote machine using rsync.
-
-- - -
-
-    cap staging wpcli:uploads:rsync:pull
-
-Pull remote uploads delta to local machine using rsync.
-
+<a name="configurationanchor"></a>
 ### Configuration
 
-This plugin needs some configuration to work properly. You can put all your configs in Capistrano stage files i.e. `config/deploy/production.rb`.
+This plugin needs some configuration to work properly.
 
-Here's the list of options and the defaults for each option:
+Here's the list of available options and the defaults for each option to put in your `config/deploy.rb` file:
 
-- - -
+|Option|Default|Usage|
+|---|---|---|
+|`set :wpcli_local_url`|`//example.dev`|Url of the WordPress root installation on the local server (used by search-replace command).|
+|`set :local_tmp_dir`|`/tmp`|Absolute path to local directory temporary directory which is read and writeable.|
+|`set :wpcli_backup_db`|`false`|Set to true if you would like to create remote database backup on each push and local database backup on each pull.|
+|`set :wpcli_delete_transients`|`true`|Set to false if you wouldn't like to delete transients on each push and pull. Transients will be removed only on the imported database.|
+|`set :wpcli_local_db_backup_dir`|`config/backup`|Absolute or relative path to local directory for storing database backups which is read and writeable. **IMPORTANT: Make sure to add the folder to .gitignore to prevent db backups from being in version control.**|
+|`set :wpcli_local_uploads_dir`|`web/app/uploads/`|Absolute or relative path to local WordPress uploads directory. **IMPORTANT: Add trailing slash!**|
+|`set :wpcli_args`|`ENV['WPCLI_ARGS']`|You can pass arguments directly to WP-CLI using this var.|
+|`set :format_options, log_file:`|`log/capistrano.log`|Capistrano's verbose output is saved to this file to facilitate debugging. Set to `nil` to disable completely. **IMPORTANT: Make sure to add the folder to .gitignore to prevent Capistrano logs from being in version control.**|
 
-    set :wpcli_remote_url
+<br/>
+Here's the list of available options and the defaults for each option to put in your `config/deploy/staging.rb` or `config/deploy/production.rb` file:
 
-Url of the WP root installation on the remote server (used by search-replace command).
+|Option|Default|Usage|
+|---|---|---|
+|`set :wpcli_remote_url`|`//example.com`|Url of the WordPress root installation on the remote server (used by search-replace command).|
+|`set :wpcli_remote_uploads_dir`|`#{shared_path.to_s}/uploads/`|Absolute path to remote WordPress uploads directory. If this option is the same for staging and production, you can put this option in your `config/deploy.rb` file **IMPORTANT: Add trailing slash!**|
 
-- - -
+**Note: if you are using Trellis with staging and production on same server you probably need to modify this standard configuration.**
 
-    set :wpcli_local_url
+<a name="tasksanchor"></a>
+### Tasks
 
-Url of the WP root installation on the local server (used by search-replace command).
+####1. Manage database
 
-- - -
+* `bundle exec cap staging/production wpcli:db:push` - Pushes the local WordPress database to the remote server and replaces the urls (Optionally backs up the remote database before pushing, only if `wpcli_backup_db` is set to true, see [Configuration](#configurationanchor))
 
-    set :local_tmp_dir
+* `bundle exec cap staging/production wpcli:db:pull` - Pulls the remote server WordPress database to local and replaces the urls (Optionally backs up the local database before pulling, only if `wpcli_backup_db` is set to true, see [Configuration](#configurationanchor))
 
-Absolute path to local directory temporary directory which is read and writeable.
+* `bundle exec cap staging/production wpcli:db:backup:remote` - Backs up remote staging/production database (uses `wpcli_local_db_backup_dir` to define the location of the export)
 
-Defaults to `/tmp`
+* `bundle exec cap development wpcli:db:backup:local` - Backs up local vagrant database (uses `wpcli_local_db_backup_dir` to define the location of the export)
 
-- - -
+####2. Manage updates
 
-    set :wpcli_backup_db
+* `bundle exec cap staging wpcli:uploads:rsync:push` - Pushes the local uploads delta to remote machine using rsync.
 
-Set to true if you would like to create backups of databases on each push. Defaults to false.
-
-- - -
-
-    set :wpcli_local_db_backup_dir
-
-Absolute or relative path to local directory for storing database backups which is read and writeable.
-
-Defaults to `config/backup`
-
-**IMPORTANT: Make sure to add the folder to .gitignore to prevent db backups from being in version control.**
-
-- - -
-
-    set :wpcli_local_uploads_dir
-
-Absolute or relative path to local WP uploads directory.
-
-Defaults to `web/app/uploads/`.
-
-**IMPORTANT: Add trailing slash!**
-
-- - -
-
-    set :wpcli_remote_uploads_dir
-
-Absolute path to remote wordpress uploads directory.
-
-Defaults to `#{shared_path.to_s}/web/app/uploads/`
-
-**IMPORTANT: Add trailing slash!**
-
-### FAQ
-
-- What if i want to use a custom port for rsync?
-  You can by setting your port somewhere inside the :ssh_options precedence.
-  See here: http://capistranorb.com/documentation/advanced-features/properties/#precedence
-
-### Vagrant
-
-If you are using another machine as a development server (Vagrant for example), you should define a `dev` role and indicate the path where the project lives on that server. This normally goes on `deploy.rb` file. Here's an example:
-
-    server "example.dev", user: 'vagrant', password: 'vagrant', roles: %w{dev}
-
-    set :dev_path, '/srv/www/example.dev/current'
+* `bundle exec cap staging wpcli:uploads:rsync:pull` - Pulls the remote uploads delta to local machine using rsync.
 
 ## Contributing
 
-1. Fork it ( https://github.com/lavmeiker/capistrano-wpcli/fork )
+1. Fork it (https://github.com/itsensoul/capistrano-trellis-bedrock-wpcli/fork)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
-
-
-# READ AND APPLY THE ISTRUCTIONS BELOW ONLY IF STAGING AND PRODUCTION ARE ON THE SAME SERVER
-# These parameters need first to be moved into production.rb and staging.rb and then replace #{fetch(:bedrock_folder)} with the name of production and staging bedrock folder
-set :deploy_to, -> { "/srv/www/#{fetch(:bedrock_folder)}" }
-set :wpcli_remote_uploads_dir, -> { "/srv/www/#{fetch(:bedrock_folder)}/current/web/app/uploads/" }

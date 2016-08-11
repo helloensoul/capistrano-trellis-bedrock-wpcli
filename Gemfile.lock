@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    capistrano-trellis-bedrock-wpcli (1.0.0)
+    capistrano-trellis-bedrock-wpcli (0.0.1)
       capistrano (~> 3.6.0)
       sshkit (~> 1.11.1)
 

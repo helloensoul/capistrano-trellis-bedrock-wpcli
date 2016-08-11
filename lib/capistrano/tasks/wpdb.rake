@@ -4,11 +4,11 @@ namespace :load do
 
     # The url under which the wordpress installation is
     # available on the remote server
-    set :wpcli_remote_url, "http://example.com"
+    set :wpcli_remote_url, "//example.com"
 
     # The url under which the wordpress installation is
     # available on the local server
-    set :wpcli_local_url, "http://example.dev"
+    set :wpcli_local_url, "//example.dev"
 
     # A local temp dir which is read and writeable
     set :local_tmp_dir, "/tmp"
@@ -16,8 +16,11 @@ namespace :load do
     # Use current time for annotating the backup file
     set :current_time, -> {Time.now.strftime("%Y_%m_%d_%H_%M")}
 
-    # Boolean to determine wether the database should be backed up or not
+    # Boolean to determine whether the database should be backed up or not
     set :wpcli_backup_db, false
+
+    # Boolean to determine whether the transients should be deleted
+    set :wpcli_delete_transients, true
 
     # Set the location of the db backup files. This is relative to the local project root path.
     set :wpcli_local_db_backup_dir, "config/backup"
@@ -54,7 +57,8 @@ namespace :wpcli do
           execute :gunzip, "-c", fetch(:wpcli_local_db_file), ">", local_tmp_file
           execute :wp, :db, :import, local_tmp_file
           execute :rm, fetch(:wpcli_local_db_file), local_tmp_file
-          execute :wp, "search-replace", fetch(:wpcli_remote_url), fetch(:wpcli_local_url), fetch(:wpcli_args) || "--skip-columns=guid", "--url=" + fetch(:wpcli_remote_url)
+          execute :wp, "search-replace", fetch(:wpcli_remote_url), fetch(:wpcli_local_url), fetch(:wpcli_args) || "--all-tables", "--url=" + fetch(:wpcli_remote_url)
+          if fetch(:wpcli_delete_transients) then execute :wp, "transient", "delete-all" end
         end
       end
       run_locally do
@@ -77,7 +81,8 @@ namespace :wpcli do
           execute :gunzip, "-c", fetch(:wpcli_remote_db_file), ">", remote_tmp_file
           execute :wp, :db, :import, remote_tmp_file
           execute :rm, fetch(:wpcli_remote_db_file), remote_tmp_file
-          execute :wp, "search-replace", fetch(:wpcli_local_url), fetch(:wpcli_remote_url), fetch(:wpcli_args) || "--skip-columns=guid", "--url=" + fetch(:wpcli_local_url)
+          execute :wp, "search-replace", fetch(:wpcli_local_url), fetch(:wpcli_remote_url), fetch(:wpcli_args) || "--all-tables", "--url=" + fetch(:wpcli_local_url)
+          if fetch(:wpcli_delete_transients) then execute :wp, "transient", "delete-all" end
         end
       end
       on roles(:dev) do
