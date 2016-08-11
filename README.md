@@ -84,9 +84,9 @@ Here's the list of available options and the defaults for each option to put in 
 
 ####2. Manage updates
 
-* `bundle exec cap staging wpcli:uploads:rsync:push` - Pushes the local uploads delta to remote machine using rsync.
+* `bundle exec cap staging/production wpcli:uploads:rsync:push` - Pushes the local uploads delta to remote machine using rsync.
 
-* `bundle exec cap staging wpcli:uploads:rsync:pull` - Pulls the remote uploads delta to local machine using rsync.
+* `bundle exec cap staging/production wpcli:uploads:rsync:pull` - Pulls the remote uploads delta to local machine using rsync.
 
 ## Contributing
 

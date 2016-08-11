@@ -1,3 +1,6 @@
+### HEAD
+* Update README.md
+
 ### 0.0.2: August 11th, 2016
 * Add CHANGELOG.md
 * Rewrite README.md
