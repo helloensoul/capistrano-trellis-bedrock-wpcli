@@ -57,8 +57,8 @@ namespace :wpcli do
           execute :gunzip, "-c", fetch(:wpcli_local_db_file), ">", local_tmp_file
           execute :wp, :db, :import, local_tmp_file
           execute :rm, fetch(:wpcli_local_db_file), local_tmp_file
-          execute :wp, "search-replace", fetch(:wpcli_remote_url), fetch(:wpcli_local_url), fetch(:wpcli_args) || "--all-tables", "--url=" + fetch(:wpcli_remote_url)
           if fetch(:wpcli_delete_transients) then execute :wp, "transient", "delete-all" end
+          execute :wp, "search-replace", fetch(:wpcli_remote_url), fetch(:wpcli_local_url), fetch(:wpcli_args) || "--all-tables", "--url=" + fetch(:wpcli_remote_url)
         end
       end
       run_locally do
@@ -81,8 +81,8 @@ namespace :wpcli do
           execute :gunzip, "-c", fetch(:wpcli_remote_db_file), ">", remote_tmp_file
           execute :wp, :db, :import, remote_tmp_file
           execute :rm, fetch(:wpcli_remote_db_file), remote_tmp_file
-          execute :wp, "search-replace", fetch(:wpcli_local_url), fetch(:wpcli_remote_url), fetch(:wpcli_args) || "--all-tables", "--url=" + fetch(:wpcli_local_url)
           if fetch(:wpcli_delete_transients) then execute :wp, "transient", "delete-all" end
+          execute :wp, "search-replace", fetch(:wpcli_local_url), fetch(:wpcli_remote_url), fetch(:wpcli_args) || "--all-tables", "--url=" + fetch(:wpcli_local_url)
         end
       end
       on roles(:dev) do
