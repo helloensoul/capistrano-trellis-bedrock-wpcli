@@ -1,5 +1,6 @@
-### HEAD
+### 1.0.0: April 26th, 2017
 * Update README.md
+* Update README.md fixing istructions for installing specific bundler version
 
 ### 0.0.2: August 11th, 2016
 * Add CHANGELOG.md
