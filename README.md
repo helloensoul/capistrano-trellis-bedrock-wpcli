@@ -75,7 +75,7 @@ Here's the list of available options and the defaults for each option to put in 
 <a name="tasksanchor"></a>
 ### Tasks
 
-####1. Manage database
+#### 1. Manage database
 
 * `bundle exec cap staging/production wpcli:db:push` - Pushes the local WordPress database to the remote server and replaces the urls (Optionally backs up the remote database before pushing, only if `wpcli_backup_db` is set to true, see [Configuration](#configurationanchor))
 
@@ -85,7 +85,7 @@ Here's the list of available options and the defaults for each option to put in 
 
 * `bundle exec cap development wpcli:db:backup:local` - Backs up local vagrant database (uses `wpcli_local_db_backup_dir` to define the location of the export)
 
-####2. Manage updates
+#### 2. Manage updates
 
 * `bundle exec cap staging/production wpcli:uploads:rsync:push` - Pushes the local uploads delta to remote machine using rsync.
 
