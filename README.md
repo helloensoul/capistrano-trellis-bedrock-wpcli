@@ -1,5 +1,7 @@
 # Capistrano::WPCLI for Trellis and Bedrock
 
+## THIS PROJECT IS NOT MAINTAINED ANYMORE
+
 [![Dependency Status](https://gemnasium.com/badges/github.com/itsensoul/capistrano-trellis-bedrock-wpcli.svg)](https://gemnasium.com/github.com/itsensoul/capistrano-trellis-bedrock-wpcli)
 
 **This project is based on [capistrano-wpcli](https://github.com/lavmeiker/capistrano-wpcli) and works only with Trellis and Bedrock.**
